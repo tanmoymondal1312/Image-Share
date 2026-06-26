@@ -1,0 +1,79 @@
+<div class="session-banner" x-data="sessionBanner('{{ expires_at }}')" x-init="startCountdown()">
+  <div class="session-banner-inner">
+    <div class="session-info">
+      <div class="session-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+        </svg>
+        আপনার সাম্প্রতিক আপলোড
+      </div>
+      <span class="session-timer" :class="{ 'expiring': minutesLeft < 10 }" x-text="timeLeft">লোড হচ্ছে...</span>
+    </div>
+
+    <!-- Mini thumbs -->
+    <div class="session-thumbs">
+      {% for img in images[:3] %}
+      <img src="/uploads/{{ group_id }}/{{ img.filename }}"
+           alt="সাম্প্রতিক ছবি"
+           class="session-thumb"
+           loading="lazy">
+      {% endfor %}
+      {% if images|length > 3 %}
+      <span class="session-more">+{{ images|length - 3 }}</span>
+      {% endif %}
+    </div>
+
+    <div class="session-actions">
+      <a href="/s/{{ short_code }}" class="btn btn-sm btn-primary" target="_blank" rel="noopener">দেখুন</a>
+      <div class="session-copy" x-data="copyLink()">
+        <button class="btn btn-sm btn-outline"
+                :class="{ 'copied': copied }"
+                @click="doCopy('{{ site_url }}/s/{{ short_code }}')"
+                x-text="copied ? 'কপি হয়েছে!' : 'লিংক কপি'">
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function sessionBanner(expiresAtStr) {
+  return {
+    expiresAt: new Date(expiresAtStr + 'Z'),
+    timeLeft: '',
+    minutesLeft: 60,
+    _timer: null,
+
+    startCountdown() {
+      this.tick();
+      this._timer = setInterval(() => this.tick(), 1000);
+    },
+
+    tick() {
+      const diff = this.expiresAt - Date.now();
+      if (diff <= 0) {
+        this.timeLeft = 'মেয়াদ শেষ';
+        clearInterval(this._timer);
+        this.$el.style.display = 'none';
+        return;
+      }
+      const m = Math.floor(diff / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      this.minutesLeft = m;
+      this.timeLeft = m + 'মি ' + String(s).padStart(2,'0') + 'সে বাকি';
+    }
+  };
+}
+
+function copyLink() {
+  return {
+    copied: false,
+    doCopy(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.copied = true;
+        setTimeout(() => this.copied = false, 2500);
+      });
+    }
+  };
+}
+</script>

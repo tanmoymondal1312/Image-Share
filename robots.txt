@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /uploads/
+Disallow: /s/
+Disallow: /session-check
+
+Sitemap: https://image-share.mediaghor.com/sitemap.xml
