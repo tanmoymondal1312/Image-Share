@@ -11,27 +11,21 @@
 
   {% for g in groups %}
   <div class="group-card" x-data="countdown('{{ g.min_expires_at }}')" x-init="init()">
-    <!-- Thumbnails -->
-    <div class="group-thumbs">
-      {% for fname in g.thumbs %}
-      <img src="/uploads/{{ g.id }}/{{ fname }}"
-           alt="Thumbnail" class="group-thumb" loading="lazy">
-      {% endfor %}
-      {% if g.img_count > 4 %}
-      <span class="group-thumb-more">+{{ g.img_count - 4 }}</span>
-      {% endif %}
+
+    <div class="group-card-icon" aria-hidden="true">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21,15 16,10 5,21"/>
+      </svg>
     </div>
 
-    <!-- Info -->
     <div class="group-info">
-      <div class="group-info-top">
-        <span class="group-img-count">{{ g.img_count }} image{{ 's' if g.img_count != 1 }}</span>
-        <span class="group-timer" :class="{ 'expiring': minutesLeft < 10 }" x-text="timeLeft">…</span>
-      </div>
+      <span class="group-img-count">{{ g.img_count }} image{{ 's' if g.img_count != 1 }}</span>
       <code class="group-code">/s/{{ g.short_code }}</code>
     </div>
 
-    <!-- Actions -->
+    <span class="group-timer" :class="{ 'expiring': minutesLeft < 10 }" x-text="timeLeft">…</span>
+
     <div class="group-actions">
       <a href="/s/{{ g.short_code }}" class="btn btn-sm btn-primary" target="_blank" rel="noopener">View</a>
 
@@ -55,6 +49,7 @@
         </svg>
       </button>
     </div>
+
   </div>
   {% endfor %}
 </div>

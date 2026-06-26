@@ -857,51 +857,32 @@ button { font-family: inherit; cursor: pointer; }
 .group-card {
   display: flex;
   align-items: center;
-  gap: .75rem;
-  padding: .8rem 1rem;
+  gap: .6rem;
+  padding: .6rem 1rem;
   border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
+  border-left: 3px solid var(--accent);
 }
 .group-card:last-child { border-bottom: none; }
 
-.group-thumbs {
-  display: flex;
-  align-items: center;
-  gap: .25rem;
-  flex-shrink: 0;
-}
-
-.group-thumb {
-  width: 38px;
-  height: 38px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1.5px solid var(--border);
-  flex-shrink: 0;
-}
-
-.group-thumb-more {
-  font-size: .7rem;
-  font-weight: 700;
-  color: var(--text-2);
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 6px;
-  width: 38px;
-  height: 38px;
+.group-card-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #eef2ff;
+  border-radius: 6px;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
-.group-info { flex: 1; min-width: 0; }
-
-.group-info-top {
+.group-info {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: .5rem;
   flex-wrap: wrap;
-  margin-bottom: .2rem;
 }
 
 .group-img-count {
@@ -910,21 +891,23 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--text);
 }
 
-.group-timer {
-  font-size: .72rem;
-  font-weight: 600;
-  color: var(--success);
-  background: #d1fae5;
-  padding: .15rem .45rem;
-  border-radius: 99px;
-}
-.group-timer.expiring { color: var(--warning); background: #fef3c7; }
-
 .group-code {
   font-size: .72rem;
   color: var(--text-3);
   font-family: "SF Mono", Consolas, monospace;
 }
+
+.group-timer {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--success);
+  background: #d1fae5;
+  padding: .15rem .5rem;
+  border-radius: 99px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.group-timer.expiring { color: var(--warning); background: #fef3c7; }
 
 .group-actions {
   display: flex;
