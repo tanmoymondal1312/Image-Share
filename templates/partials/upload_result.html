@@ -1,117 +1,72 @@
-<section class="result-card" x-data="resultCard('{{ expires_at }}')" x-init="startCountdown()">
+<section class="result-card" x-data="countdown('{{ expires_at }}')" x-init="init()">
 
   <div class="result-success-icon" aria-hidden="true">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="10"/><polyline points="9,12 12,15 16,9"/>
     </svg>
   </div>
 
-  <h2 class="result-title">আপলোড সফল!</h2>
-  <p class="result-sub">{{ image_count }}টি ছবি আপলোড হয়েছে &bull; <span x-text="timeLeft" class="result-timer" :class="{'expiring': minutesLeft < 10}">লোড হচ্ছে...</span></p>
+  <h2 class="result-title">Upload Successful!</h2>
+  <p class="result-sub">
+    {{ image_count }} image{{ 's' if image_count != 1 }} uploaded &bull;
+    <span x-text="timeLeft" class="result-timer" :class="{ 'expiring': minutesLeft < 10 }">Loading…</span>
+  </p>
 
-  <!-- Link copy -->
+  <!-- Copy link -->
   <div class="link-card" x-data="copyLink()">
-    <input type="text"
-           class="link-input"
+    <input type="text" class="link-input"
            value="{{ site_url }}/s/{{ short_code }}"
-           readonly
-           aria-label="শেয়ার লিংক"
-           x-ref="linkInput"
-           @click="$el.select()">
-    <button class="copy-btn"
-            :class="{ 'copied': copied }"
+           readonly aria-label="Share link"
+           x-ref="linkInput" @click="$el.select()">
+    <button class="copy-btn" :class="{ 'copied': copied }"
             @click="doCopy($refs.linkInput.value)"
-            :aria-label="copied ? 'কপি হয়েছে' : 'লিংক কপি করুন'">
-      <svg x-show="!copied" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            :aria-label="copied ? 'Copied!' : 'Copy link'">
+      <svg x-show="!copied" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5,15H4a2,2,0,0,1-2-2V4A2,2,0,0,1,4,2H15a2,2,0,0,1,2,2V5"/>
       </svg>
-      <svg x-show="copied" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg x-show="copied" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <polyline points="20,6 9,17 4,12"/>
       </svg>
-      <span x-text="copied ? 'কপি হয়েছে!' : 'কপি করুন'"></span>
+      <span x-text="copied ? 'Copied!' : 'Copy'"></span>
     </button>
   </div>
 
-  <!-- Short link visual -->
+  <!-- Short link pill -->
   <a href="/s/{{ short_code }}" target="_blank" class="short-link-pill" rel="noopener">
     image-share.mediaghor.com/s/{{ short_code }}
   </a>
 
-  <!-- Thumb preview -->
+  <!-- Thumbnails -->
   <div class="result-thumbs">
     {% for img in images %}
     <img src="/uploads/{{ group_id }}/{{ img.filename }}"
          alt="{{ img.original_name }}"
-         class="result-thumb"
-         loading="lazy">
+         class="result-thumb" loading="lazy">
     {% endfor %}
   </div>
 
-  <!-- Download button -->
+  <!-- Download + Actions -->
   <a href="/s/{{ short_code }}/download" class="btn-download-all btn-download-result">
     <div class="dl-all-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M21,15v4a2,2,0,0,1-2,2H5a2,2,0,0,1-2-2v-4"/>
         <polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
     </div>
     <div class="dl-all-text">
-      <span class="dl-all-label">{% if image_count == 1 %}ছবি ডাউনলোড করুন{% else %}সব ডাউনলোড করুন{% endif %}</span>
-      <span class="dl-all-meta">{{ image_count }}টি ছবি{% if image_count > 1 %} &bull; ZIP{% endif %}</span>
+      <span class="dl-all-label">{% if image_count == 1 %}Download Image{% else %}Download All{% endif %}</span>
+      <span class="dl-all-meta">{{ image_count }} image{{ 's' if image_count != 1 }}{% if image_count > 1 %} &bull; ZIP{% endif %}</span>
     </div>
     <div class="dl-all-arrow">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>
       </svg>
     </div>
   </a>
 
-  <!-- Actions -->
   <div class="result-actions">
-    <a href="/s/{{ short_code }}" target="_blank" class="btn btn-outline" rel="noopener">ছবি দেখুন</a>
-    <button class="btn btn-ghost" onclick="location.reload();">
-      নতুন আপলোড
-    </button>
+    <a href="/s/{{ short_code }}" target="_blank" class="btn btn-outline" rel="noopener">View Images</a>
+    <button class="btn btn-ghost" onclick="location.reload()">Upload More</button>
   </div>
+
 </section>
-
-<script>
-function resultCard(expiresAtStr) {
-  return {
-    expiresAt: new Date(expiresAtStr + 'Z'),
-    timeLeft: '',
-    minutesLeft: 60,
-    _timer: null,
-
-    startCountdown() {
-      this.tick();
-      this._timer = setInterval(() => this.tick(), 1000);
-    },
-
-    tick() {
-      const diff = this.expiresAt - Date.now();
-      if (diff <= 0) {
-        this.timeLeft = 'মেয়াদ শেষ';
-        clearInterval(this._timer);
-        return;
-      }
-      const m = Math.floor(diff / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      this.minutesLeft = m;
-      this.timeLeft = m + 'মি ' + String(s).padStart(2,'0') + 'সে বাকি';
-    }
-  };
-}
-
-function copyLink() {
-  return {
-    copied: false,
-    doCopy(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        this.copied = true;
-        setTimeout(() => this.copied = false, 2500);
-      });
-    }
-  };
-}
-</script>

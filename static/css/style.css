@@ -815,6 +815,276 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
+/* ── Session panel (multiple groups) ─────────────────────────────────────── */
+.session-panel {
+  background: var(--surface);
+  border: 1.5px solid #c7d2fe;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  animation: slideDown .25s ease;
+}
+
+.session-panel-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .7rem 1rem;
+  background: #eef2ff;
+  border-bottom: 1px solid #c7d2fe;
+}
+
+.session-panel-title {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: .01em;
+  text-transform: uppercase;
+}
+
+.session-panel-count {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--border);
+  padding: .2rem .5rem;
+  border-radius: 99px;
+}
+
+.group-card {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .8rem 1rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.group-card:last-child { border-bottom: none; }
+
+.group-thumbs {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  flex-shrink: 0;
+}
+
+.group-thumb {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  flex-shrink: 0;
+}
+
+.group-thumb-more {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--text-2);
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.group-info { flex: 1; min-width: 0; }
+
+.group-info-top {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+  margin-bottom: .2rem;
+}
+
+.group-img-count {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.group-timer {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--success);
+  background: #d1fae5;
+  padding: .15rem .45rem;
+  border-radius: 99px;
+}
+.group-timer.expiring { color: var(--warning); background: #fef3c7; }
+
+.group-code {
+  font-size: .72rem;
+  color: var(--text-3);
+  font-family: "SF Mono", Consolas, monospace;
+}
+
+.group-actions {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  flex-shrink: 0;
+}
+
+/* ── Danger buttons ───────────────────────────────────────────────────────── */
+.btn-danger-outline {
+  background: transparent;
+  color: var(--danger);
+  border: 1.5px solid #fca5a5;
+  border-radius: var(--radius-xs);
+  padding: .4rem .75rem;
+  font-size: .8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  white-space: nowrap;
+  font-family: inherit;
+}
+.btn-danger-outline:hover {
+  background: #fef2f2;
+  border-color: var(--danger);
+  transform: translateY(-1px);
+}
+.btn-danger-outline:active { transform: translateY(0); }
+
+/* ── Owner bar (share page) ──────────────────────────────────────────────── */
+.owner-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: .6rem .9rem;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.owner-label {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* ── Per-image expiry badge ──────────────────────────────────────────────── */
+.img-expiry-badge {
+  font-size: .65rem;
+  font-weight: 700;
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  padding: .18rem .4rem;
+  border-radius: 4px;
+  letter-spacing: .02em;
+  align-self: flex-start;
+  flex-shrink: 0;
+}
+
+/* ── Per-image delete button ─────────────────────────────────────────────── */
+.img-delete-btn {
+  position: absolute;
+  top: .35rem;
+  right: .35rem;
+  background: rgba(220,38,38,.75);
+  backdrop-filter: blur(6px);
+  border: none;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition), background var(--transition), transform var(--transition);
+  padding: 0;
+}
+.gallery-item:hover .img-delete-btn { opacity: 1; }
+.img-delete-btn:hover { background: var(--danger); transform: scale(1.1); }
+
+/* Update gallery overlay to show both badge + download side-by-side */
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.65) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity var(--transition);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: .55rem;
+  pointer-events: none;
+}
+.gallery-item:hover .gallery-overlay,
+.gallery-item:focus-visible .gallery-overlay { opacity: 1; pointer-events: auto; }
+
+/* ── Add More Images section ─────────────────────────────────────────────── */
+.add-more-wrap { display: flex; flex-direction: column; gap: .75rem; }
+
+.btn-add-more {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px dashed var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: .65rem 1rem;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+  font-family: inherit;
+}
+.btn-add-more:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+.capacity-tag {
+  margin-left: auto;
+  font-size: .72rem;
+  font-weight: 700;
+  background: var(--border);
+  color: var(--text-2);
+  padding: .15rem .45rem;
+  border-radius: 99px;
+}
+
+.add-form-panel {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  animation: slideDown .2s ease;
+}
+
+.drop-zone-sm { min-height: 100px; }
+
+.preview-grid-sm { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+
+.add-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .5rem;
+  margin-top: .75rem;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .site-header { padding: .6rem 1rem; }
   .upload-card  { padding: 1.25rem 1rem; }
@@ -826,9 +1096,9 @@ button { font-family: inherit; cursor: pointer; }
   .preview-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
   .gallery      { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 
-  .session-banner-inner { flex-direction: column; align-items: flex-start; }
-  .session-actions { width: 100%; }
-  .session-actions .btn { flex: 1; justify-content: center; }
+  .group-card   { flex-wrap: wrap; }
+  .group-actions { width: 100%; justify-content: flex-end; }
+  .owner-bar    { flex-direction: column; align-items: flex-start; }
 }
 
 @media (min-width: 640px) {

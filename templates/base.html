@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <title>{% block title %}ImageShare — ছবি শেয়ার করুন সহজে{% endblock %}</title>
-  <meta name="description" content="{% block description %}ছবি আপলোড করুন, একটি ছোট লিংক পান এবং যে কারো সাথে শেয়ার করুন। লিংক ১ ঘণ্টা সক্রিয় থাকে, তারপর স্বয়ংক্রিয়ভাবে মুছে যায়।{% endblock %}">
-  <meta name="keywords" content="image share, ছবি শেয়ার, temporary image link, photo share, short link, mediaghor">
+  <title>{% block title %}ImageShare — Free Temporary Image Sharing{% endblock %}</title>
+  <meta name="description" content="{% block description %}Upload up to 5 images, get a short shareable link instantly. Images are automatically deleted after 1 hour. No signup required.{% endblock %}">
+  <meta name="keywords" content="temporary image share, free image hosting, short image link, image upload, share photos online, 1 hour image host">
   <meta name="author" content="MediaGhor">
   <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
   <link rel="canonical" href="{% block canonical %}{{ site_url }}{% endblock %}">
@@ -15,16 +15,18 @@
   <!-- Open Graph -->
   <meta property="og:type"        content="{% block og_type %}website{% endblock %}">
   <meta property="og:site_name"   content="{{ site_name }}">
-  <meta property="og:title"       content="{% block og_title %}ImageShare — সহজে ছবি শেয়ার করুন{% endblock %}">
-  <meta property="og:description" content="{% block og_desc %}ছবি আপলোড করুন, ছোট লিংক পান। ১ ঘণ্টা সক্রিয়।{% endblock %}">
+  <meta property="og:title"       content="{% block og_title %}ImageShare — Share Images Instantly{% endblock %}">
+  <meta property="og:description" content="{% block og_desc %}Upload images, get a short link, share with anyone. Auto-deletes in 1 hour. Free, no signup.{% endblock %}">
   <meta property="og:url"         content="{% block og_url %}{{ site_url }}{% endblock %}">
   <meta property="og:image"       content="{% block og_image %}{{ site_url }}/static/og-cover.svg{% endblock %}">
-  <meta property="og:locale"      content="bn_BD">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale"      content="en_US">
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="{% block tw_title %}ImageShare{% endblock %}">
-  <meta name="twitter:description" content="{% block tw_desc %}ছবি আপলোড করুন, ছোট লিংক পান। ১ ঘণ্টা সক্রিয়।{% endblock %}">
+  <meta name="twitter:title"       content="{% block tw_title %}ImageShare — Share Images Instantly{% endblock %}">
+  <meta name="twitter:description" content="{% block tw_desc %}Upload images, get a short link, share with anyone. Auto-deletes in 1 hour.{% endblock %}">
   <meta name="twitter:image"       content="{% block tw_image %}{{ site_url }}/static/og-cover.svg{% endblock %}">
 
   <!-- Schema.org JSON-LD -->
@@ -35,10 +37,11 @@
     "@type": "WebApplication",
     "name": "ImageShare",
     "url": "{{ site_url }}",
-    "description": "Temporary image sharing — upload up to 5 images, get a short link, share with anyone. Auto-deletes after 1 hour.",
+    "description": "Free temporary image sharing. Upload up to 5 images, receive a short link, share instantly. Images auto-delete after 1 hour.",
     "applicationCategory": "UtilityApplication",
     "operatingSystem": "Web",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": ["No signup required", "1-hour auto-delete", "Short shareable links", "Up to 5 images per group"],
     "publisher": { "@type": "Organization", "name": "MediaGhor", "url": "https://mediaghor.com" }
   }
   </script>
@@ -46,23 +49,22 @@
 
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <link rel="stylesheet" href="/static/css/style.css">
-
-  <!-- Alpine.js (defer so it doesn't block render) -->
+  <script src="/static/js/app.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
-  <!-- HTMX -->
   <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"></script>
 </head>
 <body>
 
 <header class="site-header">
-  <a href="/" class="logo" aria-label="ImageShare হোম">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+  <a href="/" class="logo" aria-label="ImageShare home">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
       <polyline points="21,15 16,10 5,21"/>
     </svg>
     <span>ImageShare</span>
   </a>
-  <span class="badge-temp">১ ঘণ্টা</span>
+  <span class="badge-temp">1 hour</span>
 </header>
 
 <main class="site-main">
@@ -70,7 +72,7 @@
 </main>
 
 <footer class="site-footer">
-  <p>আপলোড করা ছবি ১ ঘণ্টা পর স্বয়ংক্রিয়ভাবে মুছে যায় &mdash; <a href="https://mediaghor.com" rel="noopener">MediaGhor</a></p>
+  <p>Uploaded images are permanently deleted after 1 hour &mdash; <a href="https://mediaghor.com" rel="noopener">MediaGhor</a></p>
 </footer>
 
 </body>

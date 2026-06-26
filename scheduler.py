@@ -9,16 +9,43 @@ logger = logging.getLogger(__name__)
 
 def cleanup_expired():
     with get_db() as conn:
+        # Step 1: delete each expired image file + row
         expired = conn.execute(
-            "SELECT id FROM image_groups WHERE expires_at <= datetime('now')"
+            "SELECT id, group_id, filename FROM images WHERE expires_at <= datetime('now')"
         ).fetchall()
 
-        for row in expired:
-            group_dir = UPLOAD_DIR / row["id"]
+        for img in expired:
+            fp = UPLOAD_DIR / img["group_id"] / img["filename"]
+            try:
+                if fp.exists():
+                    fp.unlink()
+            except OSError:
+                pass
+            conn.execute("DELETE FROM images WHERE id = ?", (img["id"],))
+            logger.info("Removed expired image: %s", img["filename"])
+
+        # Step 2: delete groups that now have zero images
+        empty = conn.execute("""
+            SELECT id FROM image_groups
+            WHERE id NOT IN (SELECT DISTINCT group_id FROM images)
+        """).fetchall()
+
+        for g in empty:
+            group_dir = UPLOAD_DIR / g["id"]
             if group_dir.exists():
-                shutil.rmtree(group_dir)
-            conn.execute("DELETE FROM image_groups WHERE id = ?", (row["id"],))
-            logger.info("Cleaned up expired group: %s", row["id"])
+                shutil.rmtree(group_dir, ignore_errors=True)
+            conn.execute("DELETE FROM image_groups WHERE id = ?", (g["id"],))
+            logger.info("Removed empty group: %s", g["id"])
+
+        # Step 3: sync group metadata from remaining images
+        conn.execute("""
+            UPDATE image_groups SET
+                image_count = (SELECT COUNT(*) FROM images WHERE group_id = image_groups.id),
+                expires_at  = COALESCE(
+                    (SELECT MAX(expires_at) FROM images WHERE group_id = image_groups.id),
+                    expires_at
+                )
+        """)
 
 
 def start_scheduler():

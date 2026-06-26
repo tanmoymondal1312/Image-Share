@@ -1,22 +1,22 @@
 {% extends "base.html" %}
-
 {% block content %}
 
-<!-- Session check: HTMX loads this on page arrival -->
+<!-- Session check: loaded once on page arrival via HTMX -->
 <div id="session-area"
      hx-get="/session-check"
      hx-trigger="load"
      hx-swap="innerHTML">
 </div>
 
+<!-- Error messages appear here (HX-Retarget from server) -->
+<div id="error-area"></div>
+
 <!-- Upload area -->
 <div id="upload-area">
-  <section class="upload-card"
-           x-data="uploadForm()"
-           x-cloak>
+  <section class="upload-card" x-data="uploadForm()" x-cloak>
 
-    <h1 class="upload-title">ছবি আপলোড করুন</h1>
-    <p class="upload-sub">সর্বোচ্চ ৫টি ছবি &bull; প্রতিটি সর্বোচ্চ ১০ MB &bull; ১ ঘণ্টা সক্রিয়</p>
+    <h1 class="upload-title">Share Images</h1>
+    <p class="upload-sub">Up to 5 images &bull; 10 MB each &bull; Link active for 1 hour</p>
 
     <form hx-post="/upload"
           hx-target="#upload-area"
@@ -37,17 +37,13 @@
             <polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/>
             <path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/>
           </svg>
-          <p class="drop-text">ছবি টেনে এনে ছাড়ুন</p>
-          <p class="drop-sub">অথবা ক্লিক করে নির্বাচন করুন</p>
+          <p class="drop-text">Drop images here</p>
+          <p class="drop-sub">or click to browse</p>
         </div>
 
-        <!-- File counter when files are selected -->
-        <div class="file-count-badge" x-show="previews.length > 0" x-text="previews.length + '/5 ছবি নির্বাচিত'"></div>
+        <div class="file-count-badge" x-show="previews.length > 0" x-text="previews.length + ' / 5 selected'"></div>
 
-        <input id="file-input"
-               type="file"
-               name="files"
-               multiple
+        <input id="file-input" type="file" name="files" multiple
                accept="image/jpeg,image/png,image/gif,image/webp"
                x-ref="fileInput"
                @change="handleFiles($event.target.files)"
@@ -59,10 +55,7 @@
         <template x-for="(p, i) in previews" :key="i">
           <div class="preview-item">
             <img :src="p.url" :alt="p.name" class="preview-img" loading="lazy">
-            <button type="button"
-                    class="remove-btn"
-                    @click.prevent="removeFile(i)"
-                    aria-label="সরান">
+            <button type="button" class="remove-btn" @click.prevent="removeFile(i)" aria-label="Remove">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
@@ -70,9 +63,7 @@
             <span class="preview-size" x-text="formatSize(p.size)"></span>
           </div>
         </template>
-
-        <!-- Add more (if < 5) -->
-        <label class="preview-add" x-show="previews.length < 5" for="file-input" aria-label="আরও ছবি যোগ করুন">
+        <label class="preview-add" x-show="previews.length < 5" for="file-input" aria-label="Add more">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
@@ -81,71 +72,19 @@
 
       <!-- Actions -->
       <div class="upload-actions">
-        <!-- Spinner (HTMX indicator) -->
-        <div id="upload-spinner" class="spinner htmx-indicator" role="status" aria-label="আপলোড হচ্ছে...">
+        <div id="upload-spinner" class="spinner htmx-indicator" role="status" aria-label="Uploading...">
           <div class="spinner-ring"></div>
         </div>
-
-        <button type="submit"
-                class="btn btn-primary"
-                :disabled="files.length === 0">
+        <button type="submit" class="btn btn-primary" :disabled="files.length === 0">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polyline points="16,16 12,12 8,16"/><line x1="12" y1="12" x2="12" y2="21"/>
             <path d="M20.39,18.39A5,5,0,0,0,18,9h-1.26A8,8,0,1,0,3,16.3"/>
           </svg>
-          আপলোড করুন
+          Upload
         </button>
       </div>
     </form>
   </section>
 </div>
 
-<script>
-function uploadForm() {
-  return {
-    files: [],
-    previews: [],
-    isDragging: false,
-    isUploading: false,
-
-    handleFiles(fileList) {
-      const arr = Array.from(fileList).slice(0, 5);
-      this.files = arr;
-      this.previews = [];
-      arr.forEach(f => {
-        const r = new FileReader();
-        r.onload = e => this.previews.push({ url: e.target.result, name: f.name, size: f.size });
-        r.readAsDataURL(f);
-      });
-    },
-
-    handleDrop(e) {
-      this.isDragging = false;
-      const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      const dropped = Array.from(e.dataTransfer.files)
-        .filter(f => allowed.includes(f.type))
-        .slice(0, 5);
-      if (!dropped.length) return;
-      const dt = new DataTransfer();
-      dropped.forEach(f => dt.items.add(f));
-      this.$refs.fileInput.files = dt.files;
-      this.handleFiles(dropped);
-    },
-
-    removeFile(i) {
-      this.files.splice(i, 1);
-      this.previews.splice(i, 1);
-      const dt = new DataTransfer();
-      this.files.forEach(f => dt.items.add(f));
-      this.$refs.fileInput.files = dt.files;
-    },
-
-    formatSize(b) {
-      if (b < 1024) return b + ' B';
-      if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-      return (b / (1024 * 1024)).toFixed(1) + ' MB';
-    }
-  };
-}
-</script>
 {% endblock %}
